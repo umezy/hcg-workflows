@@ -76,5 +76,5 @@ flowchart LR
 ## 前提条件
 
 - Unity Editor（2022.3 LTS 以降推奨）
-- [MCP For Unity](https://github.com/nicknisi/unity-mcp) がインストール済み
+- [MCP For Unity](https://github.com/CoplayDev/unity-mcp) がインストール済み
 - Claude Code
