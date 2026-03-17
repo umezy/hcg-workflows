@@ -60,6 +60,10 @@ cd Build/WebGL && python -m http.server 8080
 
 バックグラウンドで実行し、ユーザーに `http://localhost:8080` を案内する。
 
+### Step 5（オプション）: GitHub Pages にデプロイ
+
+GitHub Pages への公開を希望する場合は、`github-pages-deploy` スキルを使用する。
+
 ## サンプル
 
 [assets/WebGLBuilder.cs](assets/WebGLBuilder.cs) — 完全な Editor スクリプト。プラットフォーム切り替え・圧縮無効化・ビルド実行・結果レポートを含む。
