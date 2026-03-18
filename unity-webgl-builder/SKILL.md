@@ -40,7 +40,19 @@ PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
 PlayerSettings.WebGL.decompressionFallback = false;
 ```
 
-### Step 3: ビルド実行
+### Step 3: ビルド前クリーンアップ
+
+ビルド前に `Build/WebGL/` 内の StatiCrypt 残留ファイルを確認・削除する。これらが残っていると Unity ビルドが `index.html` を正しく生成できない場合がある。
+
+```bash
+# 以下のファイル・フォルダがあれば削除
+rm -f Build/WebGL/.staticrypt.json
+rm -rf Build/WebGL/encrypted
+```
+
+既に HTTP サーバーが `Build/WebGL` で起動中の場合、ファイルがロックされて削除できないため、先にサーバーを停止すること。
+
+### Step 4: ビルド実行
 
 MCP の `execute_menu_item` で順に実行:
 
@@ -50,7 +62,7 @@ MCP の `execute_menu_item` で順に実行:
 ビルド完了後、コンソールで `[WebGLBuilder] Build succeeded!` を確認する。
 `Build target 'WebGL' not supported` エラーが出た場合は Step 1 に戻る。
 
-### Step 4: ローカルサーバー起動
+### Step 5: ローカルサーバー起動
 
 ビルド出力ディレクトリで HTTP サーバーを起動:
 
@@ -60,7 +72,7 @@ cd Build/WebGL && python -m http.server 8080
 
 バックグラウンドで実行し、ユーザーに `http://localhost:8080` を案内する。
 
-### Step 5（オプション）: GitHub Pages にデプロイ
+### Step 6（オプション）: GitHub Pages にデプロイ
 
 GitHub Pages への公開を希望する場合は、`github-pages-deploy` スキルを使用する。
 
@@ -76,3 +88,4 @@ GitHub Pages への公開を希望する場合は、`github-pages-deploy` スキ
 | `.br` ファイルがブラウザで読めない | Brotli 圧縮有効 | `WebGLCompressionFormat.Disabled` に設定して再ビルド |
 | ビルド出力が空 | ビルド失敗 | コンソールのエラーログを確認 |
 | `Build succeeded` だが Size が 0 MB | シーンパスが間違い | `scenes` 配列のパスを確認 |
+| ブラウザでパスワードを求められる | StatiCrypt の `index.html` が残留 | `Build/WebGL` を削除してクリーンビルド（HTTP サーバー停止が必要） |

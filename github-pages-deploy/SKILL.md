@@ -16,30 +16,40 @@ WebGL ビルド成果物を StatiCrypt でパスワード保護し、GitHub Page
 
 ### Step 1: リポジトリ名の確認
 
-プロジェクトのフォルダ名をリポジトリ名として提案し、ユーザーに確認する。
+`Build/deploy/` 内に既存のデプロイフォルダ（git リポジトリ）があるか確認する。
+
+- **既存フォルダがある場合** → そのフォルダ名をリポジトリ名として自動採用し、ユーザーへの確認はスキップする
+- **既存フォルダがない場合** → プロジェクトのフォルダ名をリポジトリ名として提案し、ユーザーに確認する
+
 公開 URL: `https://<ユーザー名>.github.io/<リポジトリ名>/`
 
 ### Step 2: パスワード管理
 
-`Build/WebGL/.staticrypt.json` を確認する。
+`Build/deploy/.staticrypt.json` を確認する。
 
 - 存在する → 前回と同じパスワードで暗号化（StatiCrypt が自動管理）
 - 存在しない → 16文字の英数字パスワードを自動生成（大文字・小文字・数字混在）
 
-### Step 3: StatiCrypt で暗号化
-
-```bash
-cd Build/WebGL && npx staticrypt index.html -p "<パスワード>" --short
-```
-
-暗号化後、`encrypted/index.html` → `index.html` に置き換える。
-
-### Step 4: リポジトリ作成・デプロイ
+### Step 3: リポジトリ作成・ファイルコピー
 
 1. `gh repo create <ユーザー名>/<リポジトリ名> --public` でリポジトリ作成（既存ならスキップ）
 2. `Build/deploy/<リポジトリ名>/` にクローン（既存ならプル）
-3. `Build/WebGL/` の中身（`.staticrypt.json` を除く）をコピー
+3. `Build/WebGL/` の中身をデプロイディレクトリにコピー
 4. [assets/deploy.yml](assets/deploy.yml) を `.github/workflows/deploy.yml` としてコピー
+
+### Step 4: StatiCrypt で暗号化（デプロイディレクトリ内で実行）
+
+**重要**: `Build/WebGL/` 内では暗号化しない。必ずデプロイディレクトリ内で実行すること。`Build/WebGL/` を汚すと次回の Unity ビルドで `index.html` が上書きされず競合する。
+
+```bash
+cd Build/deploy/<リポジトリ名> && npx staticrypt index.html -p "<パスワード>" --short
+```
+
+暗号化後、`encrypted/index.html` → `index.html` に置き換える。
+`.staticrypt.json` は `Build/deploy/` に保存して次回のパスワード再利用に備える:
+```bash
+cp Build/deploy/<リポジトリ名>/.staticrypt.json Build/deploy/.staticrypt.json
+```
 5. GitHub Pages を **workflow モード** で有効化する:
    ```bash
    gh api repos/<ユーザー名>/<リポジトリ名>/pages -X POST --input - <<'EOF'
@@ -56,7 +66,7 @@ cd Build/WebGL && npx staticrypt index.html -p "<パスワード>" --short
 
 **重要**: `build_type: "legacy"` は使わない。デプロイが発動しない場合がある。必ず `build_type: "workflow"` + GitHub Actions ワークフローを使う。
 
-### Step 5: 結果の報告
+### Step 6: 結果の報告
 
 公開 URL とパスワードをユーザーに伝える。
 
